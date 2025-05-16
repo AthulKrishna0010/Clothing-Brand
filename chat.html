@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Connect & Pay</title>
+  <style>
+    :root {
+      --bg-color: #f5f7fa;
+      --header-bg: #ffffff;
+      --accent: #2b6cb0;
+      --text-color: #222;
+      --chat-bg: #ffffff;
+      --message-sent-bg: #2b6cb0;
+      --message-received-bg: #e2e8f0;
+      --button-bg: #2b6cb0;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #1a202c;
+      --header-bg: #2d3748;
+      --accent: #63b3ed;
+      --text-color: #f0f0f0;
+      --chat-bg: #2a2e37;
+      --message-sent-bg: #3182ce;
+      --message-received-bg: #4a5568;
+      --button-bg: #4299e1;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      padding: 20px;
+    }
+
+    header {
+      background-color: var(--header-bg);
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      color: var(--accent);
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: var(--accent);
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 16px;
+      margin-bottom: 4px;
+      border-radius: 5px;
+      background-color: rgba(0, 0, 0, 0.05);
+      margin-left: 10px;
+    }
+
+    .nav-link:hover {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .toggle-switch {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toggle-switch input {
+      cursor: pointer;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    /* Chat Styles */
+    .chat-container {
+      background-color: var(--chat-bg);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      height: 70vh;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .message {
+      margin-bottom: 15px;
+      max-width: 70%;
+    }
+
+    .message p {
+      padding: 10px 15px;
+      border-radius: 10px;
+      display: inline-block;
+    }
+
+    .sent {
+      margin-left: auto;
+    }
+
+    .sent p {
+      background-color: var(--message-sent-bg);
+      color: white;
+    }
+
+    .received {
+      margin-right: auto;
+    }
+
+    .received p {
+      background-color: var(--message-received-bg);
+      color: var(--text-color);
+    }
+
+    .time {
+      font-size: 0.8em;
+      margin-top: 5px;
+      display: block;
+      color: #888;
+    }
+
+    .chat-input {
+      display: flex;
+      padding: 15px;
+      gap: 10px;
+      border-top: 1px solid #ccc;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+    }
+
+    .chat-input button {
+      padding: 10px 20px;
+      background-color: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    /* Payment Styles */
+    .payment-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    .payment-form {
+      background-color: var(--chat-bg);
+      width: 100%;
+      max-width: none;
+      padding: 30px;
+      border-radius: 10px;
+    }
+
+    .payment-form h2 {
+      color: var(--accent);
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #aaa;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 20px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    .pay-button {
+      width: 100%;
+      padding: 12px;
+      background-color: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* Scrollbar */
+    .chat-messages::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+
+    @media (max-width: 600px) {
+      .form-row {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .chat-container,
+      .payment-form {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Connect & Pay</h1>
+      <div class="toggle-switch">
+        <label for="modeSwitch">🌞 / 🌙</label>
+        <input type="checkbox" id="modeSwitch" onchange="toggleTheme()" />
+        <nav>
+          <a href="#" class="nav-link" onclick="switchPage('chat')">Chat</a>
+          <a href="#" class="nav-link" onclick="switchPage('payment')">Payment</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Chat Page -->
+    <div id="chatPage" class="page active">
+      <main class="chat-container">
+        <div class="chat-messages" id="chatMessages">
+          <div class="message received">
+            <p>Welcome to the support line!</p>
+            <span class="time">09:45 AM</span>
+          </div>
+        </div>
+        <div class="chat-input">
+          <input type="text" id="messageInput" placeholder="Type something..." />
+          <button onclick="sendMessage()">Send</button>
+        </div>
+      </main>
+    </div>
+
+    <!-- Payment Page -->
+    <div id="paymentPage" class="page">
+      <main class="payment-container">
+        <div class="payment-form">
+          <h2>Secure Payment</h2>
+          <form onsubmit="handlePayment(event)">
+            <div class="form-group">
+              <label for="amount">Amount ($)</label>
+              <input type="number" id="amount" placeholder="Enter amount" required />
+            </div>
+            <div class="form-group">
+              <label for="card-number">Card Number</label>
+              <input type="text" id="card-number" placeholder="1234 5678 9012 3456" required />
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="expiry">Expiry</label>
+                <input type="text" id="expiry" placeholder="MM/YY" required />
+              </div>
+              <div class="form-group">
+                <label for="cvv">CVV</label>
+                <input type="text" id="cvv" placeholder="123" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="name">Name on Card</label>
+              <input type="text" id="name" placeholder="Jane Doe" required />
+            </div>
+            <button type="submit" class="pay-button">Pay Now</button>
+          </form>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    function sendMessage() {
+  const input = document.getElementById("messageInput");
+  const messages = document.getElementById("chatMessages");
+  if (input.value.trim() !== "") {
+    const msgDiv = document.createElement("div");
+    msgDiv.className = "message sent";
+    const msgP = document.createElement("p");
+    msgP.textContent = input.value;
+    const time = document.createElement("span");
+    time.className = "time";
+    time.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    msgDiv.appendChild(msgP);
+    msgDiv.appendChild(time);
+    messages.appendChild(msgDiv);
+    input.value = "";
+    messages.scrollTop = messages.scrollHeight;
+
+    // Auto-response after short delay
+    setTimeout(() => {
+      const autoReply = document.createElement("div");
+      autoReply.className = "message received";
+      const replyText = document.createElement("p");
+      replyText.textContent = "Thanks! We will reach out to you shortly.";
+      const replyTime = document.createElement("span");
+      replyTime.className = "time";
+      replyTime.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      autoReply.appendChild(replyText);
+      autoReply.appendChild(replyTime);
+      messages.appendChild(autoReply);
+      messages.scrollTop = messages.scrollHeight;
+    }, 600);
+  }
+}
+
+
+    document.getElementById("messageInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    function switchPage(page) {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.getElementById(page + "Page").classList.add("active");
+    }
+
+    function handlePayment(e) {
+      e.preventDefault();
+      alert("Payment Successful!");
+      e.target.reset();
+    }
+
+    function toggleTheme() {
+      const theme = document.documentElement.getAttribute("data-theme");
+      const newTheme = theme === "light" ? "dark" : "light";
+      document.documentElement.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+    }
+
+    function goToPayment(totalAmount) {
+  switchPage('payment'); // Switch to payment page
+  const amountInput = document.getElementById("amount");
+  amountInput.value = totalAmount.toFixed(2);
+  amountInput.readOnly = true;
+  amountInput.style.backgroundColor = "#e2e8f0"; // Optional styling to show it's disabled
+}
+
+    // Load theme from storage
+    (function() {
+      const saved = localStorage.getItem("theme") || "light";
+      document.documentElement.setAttribute("data-theme", saved);
+      document.getElementById("modeSwitch").checked = saved === "dark";
+    })();
+  </script>
+</body>
+</html>

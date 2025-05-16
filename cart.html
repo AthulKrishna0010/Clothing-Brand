@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ecommerce website</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://kit.fontawesome.com/0e53af926d.js" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <!--header section-->
+
+    <header>
+        <div id="header">
+            <div class="header-logo">
+                <a href="indext.html"><img src="images/brand_logo.jpg" alt="" height="70px" width="90px" /></a>
+            </div>
+            <div class="header-list">
+                <nav class="header-list-nav">
+                    <ul>
+                        <li><a class="active" href="index.html">Home</a></li>
+                        <li><a href="shop.html">Shop</a></li>
+                        <li><a href="blog.html">Blog</a></li>
+                        <li><a href="about.html">About</a></li>
+                        <li><a href="chat.html">Contact Us</a></li>
+                    </ul>
+                </nav>
+                <div class="header-list-icon">
+                    <a href="cart.html"><i class="fa fa-bag-shopping"></i></a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="product-section">
+  <h1>Your Cart</h1>
+  <div class="pro-collection" id="cart-items"></div>
+</main>
+
+        <script>
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    const cartContainer = document.getElementById('cart-items');
+    const footer = document.createElement('div');
+    footer.id = 'cart-footer';
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    function renderCart() {
+      cartContainer.innerHTML = '';
+      footer.innerHTML = '';
+
+      if (cart.length === 0) {
+        cartContainer.innerHTML = '<p>Your cart is empty.</p>';
+        return;
+      }
+
+      let total = 0;
+
+      cart.forEach((product, index) => {
+        total += parseFloat(product.price);
+
+        const item = document.createElement('div');
+        item.className = 'product-cart';
+        item.innerHTML = `
+          <img src="${product.img}" alt="${product.name}" />
+          <span>Brand</span>
+          <h4>${product.name}</h4>
+          <div class="stars">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <h4 class="price">$${product.price}</h4>
+          <button class="remove-btn" data-index="${index}">Remove</button>
+        `;
+        cartContainer.appendChild(item);
+      });
+
+      // Footer with total and checkout
+      footer.innerHTML = `
+        <div class="cart-total">
+          <h3>Total: $${total.toFixed(2)}</h3>
+          <button class="checkout-btn">Checkout</button>
+        </div>
+      `;
+      cartContainer.appendChild(footer);
+
+      // Add event listeners to remove buttons
+      document.querySelectorAll('.remove-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          const index = e.target.dataset.index;
+          cart.splice(index, 1);
+          localStorage.setItem('cart', JSON.stringify(cart));
+          renderCart();
+        });
+      });
+
+      // Checkout button behavior
+      document.querySelector('.checkout-btn').addEventListener('click', () => {
+        alert('Checkout functionality coming soon!');
+      });
+    }
+
+    renderCart();
+  });
+</script>
+
+
+
+
+
+    
+</body>
+
+</html>
